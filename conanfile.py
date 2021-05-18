@@ -30,14 +30,18 @@ class ApriltagConan(ConanFile):
     def build(self):
         apriltag_source_dir = os.path.join(self.source_folder, self.source_subfolder)
         cmake = CMake(self)
+        cmake.definitions["BUILD_PYTHON_WRAPPER"] = False
         cmake.configure(source_folder="source_subfolder", build_folder="build_subfolder")
         cmake.build()
-        cmake.install()
+        
+        
 
     def package(self):
-        self.copy("*.so", dst="self._build_subfolder", keep_path=False)
-        self.copy("*.lib", dst="self._build_subfolder", keep_path=False)
-        self.copy("*.a", dst="self._build_subfolder", keep_path=False)
+        include_path = os.path.join("include","apriltag");
+        self.copy(pattern="*.h*", dst="include", src="source_subfolder", keep_path=True)
+        self.copy(pattern="*.a", dst="lib", src="build_subfolder", keep_path=False)
+        self.copy(pattern="*.so*", dst="lib", src="build_subfolder", keep_path=False)
+
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
